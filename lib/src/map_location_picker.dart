@@ -153,6 +153,9 @@ class MapLocationPicker extends StatefulWidget {
 
   /// Hide Suggestions on keyboard hide
   final bool hideSuggestionsOnKeyboardHide;
+
+  final LatLng? initialPosition;
+
   const MapLocationPicker({
     Key? key,
     this.desiredAccuracy = LocationAccuracy.high,
@@ -204,6 +207,7 @@ class MapLocationPicker extends StatefulWidget {
     this.hideSuggestionsOnKeyboardHide = false,
     this.showNextButton = true,
     this.onLocationSelectionChanged,
+    this.initialPosition,
   }) : super(key: key);
 
   @override
@@ -218,7 +222,7 @@ class _MapLocationPickerState extends State<MapLocationPicker> {
   final TextEditingController _searchController = TextEditingController();
 
   /// initial latitude & longitude
-  LatLng _initialPosition = const LatLng(28.8993468, 76.6250249);
+  late LatLng _initialPosition;
 
   /// initial address text
   String _address = "Tap on map to get address";
@@ -234,6 +238,21 @@ class _MapLocationPickerState extends State<MapLocationPicker> {
 
   /// GeoCoding results list for further use
   List<GeocodingResult> _geocodingResultList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _initialPosition =
+        widget.initialPosition ?? const LatLng(28.8993468, 76.6250249);
+  }
+
+  @override
+  void didUpdateWidget(covariant MapLocationPicker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialPosition != null) {
+      _initialPosition = widget.initialPosition!;
+    }
+  }
 
   /// Camera position moved to location
   CameraPosition cameraPosition() {
