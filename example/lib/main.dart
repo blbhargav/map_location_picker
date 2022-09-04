@@ -26,66 +26,97 @@ class _MyAppState extends State<MyApp> {
       appBar: AppBar(
         title: const Text('location picker'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Spacer(),
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              "Google Map Location Picker\nMade By Arvind 😃 with Flutter 🚀",
-              textAlign: TextAlign.center,
-              textScaleFactor: 1.2,
-              style: TextStyle(
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          const Spacer(),
-          Center(
-            child: ElevatedButton(
-              child: const Text('Pick location'),
-              onPressed: () async {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) {
-                      return MapLocationPicker(
-                        apiKey: "API_KEY_HERE",
-                        canPopOnNextButtonTaped: true,
-                        onNext: (GeocodingResult? result) {
-                          if (result != null) {
-                            setState(() {
-                              address = result.formattedAddress ?? "";
-                            });
-                          }
-                        },
-                        onSuggestionSelected: (PlacesDetailsResponse? result) {
-                          if (result != null) {
-                            setState(() {
-                              autocompletePlace =
-                                  result.result.formattedAddress ?? "";
-                            });
-                          }
-                        },
-                      );
-                    },
+      body: SingleChildScrollView(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  "Google Map Location Picker\nMade By Arvind 😃 with Flutter 🚀",
+                  textAlign: TextAlign.center,
+                  textScaleFactor: 1.2,
+                  style: TextStyle(
+                    color: Colors.grey,
                   ),
-                );
-              },
-            ),
+                ),
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height / 2,
+                child: MapLocationPicker(
+                  apiKey: "YOUR_API_KEY",
+                  canPopOnNextButtonTaped: true,
+                  showBackButton: false,
+                  showNextButton: false,
+                  showMoreOptions: false,
+                  onLocationSelectionChanged: (GeocodingResult? result) {
+                    if (result != null) {
+                      setState(() {
+                        address = result.formattedAddress ?? "";
+                      });
+                    }
+                  },
+                  onNext: (GeocodingResult? result) {},
+                  onSuggestionSelected: (PlacesDetailsResponse? result) {
+                    if (result != null) {
+                      setState(() {
+                        autocompletePlace =
+                            result.result.formattedAddress ?? "";
+                      });
+                    }
+                  },
+                ),
+              ),
+              const SizedBox(
+                height: 50,
+                child: Center(child: Text('OR')),
+              ),
+              Center(
+                child: ElevatedButton(
+                  child: const Text('Pick location'),
+                  onPressed: () async {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return MapLocationPicker(
+                            apiKey: "YOUR_API_KEY",
+                            canPopOnNextButtonTaped: true,
+                            onNext: (GeocodingResult? result) {
+                              if (result != null) {
+                                setState(() {
+                                  address = result.formattedAddress ?? "";
+                                });
+                              }
+                            },
+                            onSuggestionSelected:
+                                (PlacesDetailsResponse? result) {
+                              if (result != null) {
+                                setState(() {
+                                  autocompletePlace =
+                                      result.result.formattedAddress ?? "";
+                                });
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+              ListTile(
+                title: Text("Geocoded Address: $address"),
+              ),
+              ListTile(
+                title: Text("Autocomplete Address: $autocompletePlace"),
+              ),
+            ],
           ),
-          ListTile(
-            title: Text("Geocoded Address: $address"),
-          ),
-          ListTile(
-            title: Text("Autocomplete Address: $autocompletePlace"),
-          ),
-          const Spacer(
-            flex: 3,
-          ),
-        ],
+        ),
       ),
     );
   }

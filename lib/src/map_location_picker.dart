@@ -81,6 +81,12 @@ class MapLocationPicker extends StatefulWidget {
   /// On Next Page callback
   final Function(GeocodingResult?) onNext;
 
+  /// To hide next button
+  final bool showNextButton;
+
+  /// Location selection listener will be useful with this package is used as a widget
+  final Function(GeocodingResult?)? onLocationSelectionChanged;
+
   /// Show back button (default: true)
   final bool showBackButton;
 
@@ -196,6 +202,8 @@ class MapLocationPicker extends StatefulWidget {
     this.components = const [],
     this.strictbounds = false,
     this.hideSuggestionsOnKeyboardHide = false,
+    this.showNextButton = true,
+    this.onLocationSelectionChanged,
   }) : super(key: key);
 
   @override
@@ -275,6 +283,7 @@ class _MapLocationPickerState extends State<MapLocationPicker> {
       if (response.results.length > 1) {
         _geocodingResultList = response.results;
       }
+      widget.onLocationSelectionChanged?.call(_geocodingResult);
       setState(() {});
     } catch (e) {
       logger.e(e);
@@ -327,6 +336,14 @@ class _MapLocationPickerState extends State<MapLocationPicker> {
           .animateCamera(CameraUpdate.newCameraPosition(cameraPosition()));
       _address = response.result.formattedAddress ?? "";
       widget.onSuggestionSelected?.call(response);
+      Geometry geometry = Geometry(
+          location: Location(
+        lat: _initialPosition.latitude,
+        lng: _initialPosition.longitude,
+      ));
+      GeocodingResult geoLocation =
+          GeocodingResult(geometry: geometry, placeId: placeId);
+      widget.onLocationSelectionChanged?.call(geoLocation);
       setState(() {});
     } catch (e) {
       logger.e(e);
@@ -536,19 +553,20 @@ class _MapLocationPickerState extends State<MapLocationPicker> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      ListTile(
-                        title: Text(_address),
-                        trailing: IconButton(
-                          tooltip: widget.bottomCardTooltip,
-                          icon: widget.bottomCardIcon,
-                          onPressed: () async {
-                            widget.onNext.call(_geocodingResult);
-                            if (widget.canPopOnNextButtonTaped) {
-                              Navigator.pop(context);
-                            }
-                          },
+                      if (widget.showNextButton)
+                        ListTile(
+                          title: Text(_address),
+                          trailing: IconButton(
+                            tooltip: widget.bottomCardTooltip,
+                            icon: widget.bottomCardIcon,
+                            onPressed: () async {
+                              widget.onNext.call(_geocodingResult);
+                              if (widget.canPopOnNextButtonTaped) {
+                                Navigator.pop(context);
+                              }
+                            },
+                          ),
                         ),
-                      ),
                       if (widget.showMoreOptions &&
                           _geocodingResultList.isNotEmpty)
                         GestureDetector(
@@ -568,6 +586,8 @@ class _MapLocationPickerState extends State<MapLocationPicker> {
                                         _address =
                                             element.formattedAddress ?? "";
                                         _geocodingResult = element;
+                                        widget.onLocationSelectionChanged
+                                            ?.call(_geocodingResult);
                                         setState(() {});
                                         Navigator.pop(context);
                                       },
