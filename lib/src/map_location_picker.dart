@@ -244,6 +244,7 @@ class _MapLocationPickerState extends State<MapLocationPicker> {
     super.initState();
     _initialPosition =
         widget.initialPosition ?? const LatLng(28.8993468, 76.6250249);
+    cameraPosition();
   }
 
   @override
@@ -251,6 +252,7 @@ class _MapLocationPickerState extends State<MapLocationPicker> {
     super.didUpdateWidget(oldWidget);
     if (widget.initialPosition != null) {
       _initialPosition = widget.initialPosition!;
+      cameraPosition();
     }
   }
 
